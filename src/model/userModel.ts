@@ -9,7 +9,6 @@ interface IUser {
     age: number
     Weight: number
     height: number
-    comparePassword: (password: string) => Promise<boolean>
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -22,17 +21,10 @@ const userSchema = new mongoose.Schema<IUser>({
 });
 
 userSchema.pre("save", async function (next) {
-    if(this.isModified("password")) {
-        return next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    const hash = await bcrypt.hash(this.password, 10);
+    this.password = hash;
     next();
 });
-
-userSchema.methods.comparePassword = async function (password: string) {
-    return await bcrypt.compare(password, this.password);
-}
 
 const User  = mongoose.model<IUser>("User", userSchema);
 export default User
