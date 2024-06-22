@@ -42,4 +42,19 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
-export {register, login}
+const edit = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, email, password, age, Weight, height } = req.body;
+  try {
+    const user = await User.findById(id);
+    if (!user) {  
+      return res.status(404).json({ message: "User not found" });
+    }
+   const userUpdated = await User.updateOne({ _id: id }, { $set: { name, email, password, age, Weight, height } })
+   
+    return res.status(200).json({ message: "User updated successfully", userUpdated });  
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+export {register, login, edit}
