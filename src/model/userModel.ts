@@ -20,11 +20,5 @@ const userSchema = new mongoose.Schema<IUser>({
     password: { type: String, required: true },
 });
 
-userSchema.pre("save", async function (next) {
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
-    next();
-});
-
 const User  = mongoose.model<IUser>("User", userSchema);
 export default User
