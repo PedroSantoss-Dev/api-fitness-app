@@ -72,4 +72,33 @@ const edit = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-export { register, login, edit };
+
+const profile = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const userDeleted = await User.deleteOne({ _id: id });
+    return res
+      .status(200)
+      .json({ message: "User deleted successfully", userDeleted });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+export { register, login, edit, profile, deleteUser };
