@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Exercise from "../model/exerciseModel";
+import Category from "../model/categories";
 
 
 const RegisterExercise = async(req: Request, res: Response) => {
@@ -26,7 +27,7 @@ const RegisterExercise = async(req: Request, res: Response) => {
 }
 const getExercises = async(req: Request, res: Response) => {
   try {
-    const exercises = await Exercise.find();
+    const exercises = await Exercise.find().populate('category');
     return res.status(200).json({ exercises });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
@@ -45,4 +46,30 @@ const getExerciseById = async(req: Request, res: Response) => {
   }
 }
 
-export { RegisterExercise, getExercises, getExerciseById }
+const category = async(req: Request, res: Response) => {
+  const {name} = req.body;
+  try {
+    const categoryExists = await Category.findOne({ name });
+    if (categoryExists) {
+      return res.status(400).json({ message: "Category already exists" });
+    }
+    const category = await Category.create({
+      name
+    })
+    return res.status(201).json({ category });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const getExercisesByCategory = async(req: Request, res: Response) => {
+  try{
+    const exercises = await Exercise.find().populate('category');
+    
+    return res.status(200).json({ exercises });
+  }catch(error){
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export { RegisterExercise, getExercises, getExerciseById, category ,getExercisesByCategory }
